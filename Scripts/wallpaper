@@ -1,0 +1,37 @@
+#!/bin/sh
+
+default_dir="/home/jordan/Pictures/Wallpapers/Default"
+
+set_wallpaper() {
+    local wall="$1"
+    xwallpaper --zoom "$wall"
+    wal -c
+    wal -i "$wall"
+    pywal-spicetify Dribbblish &
+    conky &
+    xdotool key super+F5+XF86MonBrightnessDown
+}
+
+random_wallpaper() {
+    local dir="$1"
+    find "$dir" -type f -name "*.jpg" -o -name "*.png" | shuf -n 1
+}
+
+if [ $# -eq 0 ]; then
+    # No arguments provided, use default directory
+    wall=$(random_wallpaper "$default_dir")
+elif [ "$1" = "random" ]; then
+    # Random wallpaper from any folder in ~/Pictures/Wallpapers
+    wall=$(find ~/Pictures/Wallpapers -type f -name "*.jpg" -o -name "*.png" | shuf -n 1)
+elif [ -d "$1" ]; then
+    # Argument is a directory, randomize wallpaper in that directory
+    wall=$(random_wallpaper "$1")
+elif [ -f "$1" ]; then
+    # Argument is a file, use that as wallpaper
+    wall="$1"
+else
+    echo "Invalid argument. Provide a file path, directory path, or 'random'."
+    exit 1
+fi
+
+set_wallpaper "$wall"
